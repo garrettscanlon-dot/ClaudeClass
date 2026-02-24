@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monday Morning Playbook — Solv Health</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #1a56db;
+      --blue-light: #e8f0fe;
+      --red:        #c81e1e;
+      --red-light:  #fde8e8;
+      --yellow:     #b45309;
+      --yellow-light: #fef3c7;
+      --green:      #057a55;
+      --green-light: #def7ec;
+      --gray-50:    #f9fafb;
+      --gray-100:   #f3f4f6;
+      --gray-200:   #e5e7eb;
+      --gray-400:   #9ca3af;
+      --gray-600:   #4b5563;
+      --gray-800:   #1f2937;
+      --white:      #ffffff;
+      --radius:     8px;
+      --shadow:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --shadow-md:  0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.05);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+
+    .logo {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--blue);
+      letter-spacing: -.3px;
+    }
+
+    .nav-date {
+      font-size: 13px;
+      color: var(--gray-400);
+      padding-left: 12px;
+      border-left: 1px solid var(--gray-200);
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--gray-600);
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── INTEGRATION BAR ── */
+    .integration-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .integration-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--gray-400);
+      margin-right: 4px;
+    }
+
+    .int-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+
+    .int-badge.ok {
+      background: var(--green-light);
+      color: var(--green);
+      border-color: #a7f3d0;
+    }
+
+    .int-badge.warn {
+      background: var(--yellow-light);
+      color: var(--yellow);
+      border-color: #fcd34d;
+    }
+
+    .int-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .int-warn-msg {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--yellow);
+      background: var(--yellow-light);
+      border: 1px solid #fcd34d;
+      border-radius: var(--radius);
+      padding: 3px 10px;
+    }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+    .grid-top {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    .card-body { padding: 16px; }
+
+    /* ── STAT CARDS ── */
+    .stat-card { padding: 16px; }
+
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--gray-400);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+
+    .stat-delta {
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .stat-delta.up   { color: var(--green); }
+    .stat-delta.down { color: var(--red); }
+    .stat-delta.flat { color: var(--gray-400); }
+
+    /* ── PRIORITY QUEUE ── */
+    .pq-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .pq-item:last-child { border-bottom: none; }
+    .pq-item.done { opacity: .4; }
+    .pq-item.done .pq-account { text-decoration: line-through; }
+
+    .health-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .health-dot.red    { background: var(--red); }
+    .health-dot.yellow { background: #f59e0b; }
+    .health-dot.green  { background: #10b981; }
+
+    .pq-content { flex: 1; }
+
+    .pq-account {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .pq-reason {
+      font-size: 12px;
+      color: var(--gray-600);
+      margin-bottom: 8px;
+    }
+
+    .pq-action {
+      font-size: 12px;
+      color: var(--blue);
+      background: var(--blue-light);
+      border: none;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .pq-buttons { display: flex; gap: 6px; }
+
+    .btn {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 5px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+
+    .btn:hover { opacity: .8; }
+
+    .btn-done {
+      background: var(--green-light);
+      color: var(--green);
+      border-color: #a7f3d0;
+    }
+
+    .btn-snooze {
+      background: var(--gray-100);
+      color: var(--gray-600);
+      border-color: var(--gray-200);
+    }
+
+    .pq-mrr {
+      font-size: 12px;
+      color: var(--gray-400);
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+
+    /* ── ACCOUNT HEALTH PANEL ── */
+    .health-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .health-item:last-child { border-bottom: none; }
+
+    .health-info { flex: 1; }
+
+    .health-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .health-meta {
+      font-size: 11px;
+      color: var(--gray-400);
+    }
+
+    .health-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 12px;
+    }
+
+    .health-badge.red    { background: var(--red-light);    color: var(--red); }
+    .health-badge.yellow { background: var(--yellow-light); color: var(--yellow); }
+    .health-badge.green  { background: var(--green-light);  color: var(--green); }
+
+    .health-delta {
+      font-size: 12px;
+      font-weight: 600;
+      width: 44px;
+      text-align: right;
+    }
+
+    .health-delta.up   { color: var(--green); }
+    .health-delta.down { color: var(--red); }
+    .health-delta.flat { color: var(--gray-400); }
+
+    /* ── SLACK DRAFT ── */
+    .slack-draft {
+      background: #f8f8f8;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0 16px 16px;
+      white-space: pre-wrap;
+      font-family: inherit;
+      color: var(--gray-800);
+      resize: vertical;
+      min-height: 160px;
+      width: calc(100% - 32px);
+      outline: none;
+    }
+
+    .slack-draft:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26,86,219,.1);
+    }
+
+    .slack-actions {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 16px;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--gray-600);
+      border-color: var(--gray-200);
+      padding: 6px 14px;
+      font-size: 13px;
+    }
+
+    .copy-confirm {
+      font-size: 12px;
+      color: var(--green);
+      align-self: center;
+      margin-left: 4px;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .copy-confirm.show { opacity: 1; }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--gray-400);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* ── EMPTY / DONE STATE ── */
+    .all-done {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+
+    .all-done .check { font-size: 28px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <span class="logo">Monday Morning Playbook</span>
+    <span class="nav-date">Monday, February 23, 2026</span>
+  </div>
+  <div class="nav-user">
+    <div class="avatar">AR</div>
+    Alex Rivera &middot; Partner Success
+  </div>
+</nav>
+
+<!-- INTEGRATION STATUS BAR -->
+<div class="integration-bar">
+  <span class="integration-label">Integrations</span>
+  <span class="int-badge ok"><span class="dot"></span>Looker</span>
+  <span class="int-badge ok"><span class="dot"></span>Salesforce</span>
+  <span class="int-badge ok"><span class="dot"></span>Linear</span>
+  <span class="int-badge warn" title="Gong sync is delayed — call data may be up to 6 hours old"><span class="dot"></span>Gong</span>
+  <span class="int-badge ok"><span class="dot"></span>Slack</span>
+  <span class="int-warn-msg">⚠ Gong data delayed up to 6 hrs — call signals may be incomplete</span>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- PORTFOLIO SUMMARY -->
+  <div class="grid-top">
+    <div class="card stat-card">
+      <div class="stat-label">MRR at Risk</div>
+      <div class="stat-value">$127K</div>
+      <div class="stat-delta down">▲ $22K vs. last week</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Renewal (Next 30 Days)</div>
+      <div class="stat-value">$52K</div>
+      <div class="stat-delta flat">2 accounts</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Expansion Pipeline</div>
+      <div class="stat-value">$38K</div>
+      <div class="stat-delta up">▲ $15K vs. last week</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Open Implementation Cases</div>
+      <div class="stat-value">4</div>
+      <div class="stat-delta down">▲ 1 vs. last week</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid-main">
+
+    <!-- LEFT: PRIORITY QUEUE + SLACK DRAFT -->
+    <div>
+
+      <!-- PRIORITY QUEUE -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <span class="card-title">Priority Queue</span>
+          <span style="font-size:12px; color: var(--gray-400);">5 accounts · ranked by urgency</span>
+        </div>
+
+        <!-- Item 1 -->
+        <div class="pq-item" id="pq1">
+          <div class="health-dot red"></div>
+          <div class="pq-content">
+            <div class="pq-account">Mesa Urgent Care</div>
+            <div class="pq-reason">Renewal in 14 days · Usage down 22% W/W · No contact in 18 days</div>
+            <div class="pq-action">Schedule renewal call this week</div>
+            <div class="pq-buttons">
+              <button class="btn btn-done" onclick="markDone('pq1')">Done</button>
+              <button class="btn btn-snooze" onclick="snooze('pq1')">Snooze</button>
+            </div>
+          </div>
+          <div class="pq-mrr">$45K MRR</div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="pq-item" id="pq2">
+          <div class="health-dot red"></div>
+          <div class="pq-content">
+            <div class="pq-account">Sonoran Health</div>
+            <div class="pq-reason">NPS dropped 18 pts · 3 open support tickets this week</div>
+            <div class="pq-action">Flag for churn risk · Loop in support lead</div>
+            <div class="pq-buttons">
+              <button class="btn btn-done" onclick="markDone('pq2')">Done</button>
+              <button class="btn btn-snooze" onclick="snooze('pq2')">Snooze</button>
+            </div>
+          </div>
+          <div class="pq-mrr">$35K MRR</div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="pq-item" id="pq3">
+          <div class="health-dot yellow"></div>
+          <div class="pq-content">
+            <div class="pq-account">Valley Medical Group</div>
+            <div class="pq-reason">Usage down 40% this month · Champion on leave</div>
+            <div class="pq-action">Identify interim champion contact</div>
+            <div class="pq-buttons">
+              <button class="btn btn-done" onclick="markDone('pq3')">Done</button>
+              <button class="btn btn-snooze" onclick="snooze('pq3')">Snooze</button>
+            </div>
+          </div>
+          <div class="pq-mrr">$32K MRR</div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="pq-item" id="pq4">
+          <div class="health-dot yellow"></div>
+          <div class="pq-content">
+            <div class="pq-account">Desert Care Network</div>
+            <div class="pq-reason">Implementation ticket open 18 days · No Linear update since Feb 4</div>
+            <div class="pq-action">Unblock implementation — check Linear #DCN-112</div>
+            <div class="pq-buttons">
+              <button class="btn btn-done" onclick="markDone('pq4')">Done</button>
+              <button class="btn btn-snooze" onclick="snooze('pq4')">Snooze</button>
+            </div>
+          </div>
+          <div class="pq-mrr">$15K MRR</div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="pq-item" id="pq5">
+          <div class="health-dot green"></div>
+          <div class="pq-content">
+            <div class="pq-account">Summit Health Clinics</div>
+            <div class="pq-reason">Usage up 8% W/W · Added 2 locations last month</div>
+            <div class="pq-action">Share new Solv Connect feature — expansion candidate</div>
+            <div class="pq-buttons">
+              <button class="btn btn-done" onclick="markDone('pq5')">Done</button>
+              <button class="btn btn-snooze" onclick="snooze('pq5')">Snooze</button>
+            </div>
+          </div>
+          <div class="pq-mrr">$28K MRR</div>
+        </div>
+
+        <div class="all-done" id="allDone" style="display:none;">
+          <div class="check">✓</div>
+          All priorities handled. Great start to the week.
+        </div>
+      </div>
+
+      <!-- SLACK DRAFT -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">#psc-team Draft</span>
+          <span style="font-size:12px; color: var(--gray-400);">Review and post to Slack</span>
+        </div>
+        <textarea class="slack-draft" id="slackDraft">📋 Monday Morning Playbook — Feb 23
+
+📌 Key Finding: $127K MRR at risk this week (+$22K vs. last week), driven by Mesa Urgent Care's upcoming renewal and Sonoran Health's NPS drop. Gong data is partially delayed — call signals may be incomplete.
+
+This week's priorities:
+1. Mesa Urgent Care — renewal in 14 days, usage trending down. Getting a call on the calendar today.
+2. Sonoran Health — NPS dropped 18 pts, 3 open support tickets. Flagging for churn risk and looping in support.
+3. Valley Medical Group — usage down 40%, champion is OOO. Working to identify an interim contact.
+
+🟢 Bright spot: Summit Health Clinics up 8% W/W — expansion conversation to open this week.</textarea>
+        <div class="slack-actions">
+          <button class="btn btn-primary" onclick="copyDraft()">Copy to Clipboard</button>
+          <button class="btn btn-secondary" onclick="regenerate()">Regenerate</button>
+          <span class="copy-confirm" id="copyConfirm">Copied!</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: ACCOUNT HEALTH -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Account Health</span>
+          <span style="font-size:12px; color: var(--gray-400);">W/W delta</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot red" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">Mesa Urgent Care</div>
+            <div class="health-meta">$45K MRR · Renewal Feb 7</div>
+          </div>
+          <span class="health-badge red">At Risk</span>
+          <span class="health-delta down">−22%</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot red" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">Sonoran Health</div>
+            <div class="health-meta">$35K MRR · NPS: 24 (was 42)</div>
+          </div>
+          <span class="health-badge red">At Risk</span>
+          <span class="health-delta down">−11%</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot yellow" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">Valley Medical Group</div>
+            <div class="health-meta">$32K MRR · Champion OOO</div>
+          </div>
+          <span class="health-badge yellow">Watch</span>
+          <span class="health-delta down">−40%</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot yellow" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">Desert Care Network</div>
+            <div class="health-meta">$15K MRR · Impl. stalled</div>
+          </div>
+          <span class="health-badge yellow">Watch</span>
+          <span class="health-delta flat">0%</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot green" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">Summit Health Clinics</div>
+            <div class="health-meta">$28K MRR · 2 new locations</div>
+          </div>
+          <span class="health-badge green">Healthy</span>
+          <span class="health-delta up">+8%</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot green" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">Pima Care Partners</div>
+            <div class="health-meta">$22K MRR · QBR scheduled</div>
+          </div>
+          <span class="health-badge green">Healthy</span>
+          <span class="health-delta up">+5%</span>
+        </div>
+
+        <div class="health-item">
+          <div class="health-dot green" style="flex-shrink:0"></div>
+          <div class="health-info">
+            <div class="health-name">ClearPath Urgent Care</div>
+            <div class="health-meta">$18K MRR · Stable</div>
+          </div>
+          <span class="health-badge green">Healthy</span>
+          <span class="health-delta flat">+1%</span>
+        </div>
+
+        <div style="padding: 10px 16px; border-top: 1px solid var(--gray-100);">
+          <span style="font-size: 12px; color: var(--gray-400);">+ 8 more accounts · All green</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function markDone(id) {
+    const el = document.getElementById(id);
+    el.classList.add('done');
+    checkAllDone();
+  }
+
+  function snooze(id) {
+    const el = document.getElementById(id);
+    el.style.display = 'none';
+    checkAllDone();
+  }
+
+  function checkAllDone() {
+    const items = document.querySelectorAll('.pq-item');
+    const allHandled = Array.from(items).every(
+      el => el.classList.contains('done') || el.style.display === 'none'
+    );
+    document.getElementById('allDone').style.display = allHandled ? 'block' : 'none';
+  }
+
+  function copyDraft() {
+    const draft = document.getElementById('slackDraft').value;
+    navigator.clipboard.writeText(draft).then(() => {
+      const confirm = document.getElementById('copyConfirm');
+      confirm.classList.add('show');
+      setTimeout(() => confirm.classList.remove('show'), 2000);
+    });
+  }
+
+  function regenerate() {
+    alert('In a live build, this would re-pull signals from Looker, Salesforce, Linear, and Gong and regenerate the draft.');
+  }
+</script>
+
+</body>
+</html>
